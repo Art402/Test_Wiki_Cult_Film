@@ -11,12 +11,15 @@
 
 <h4 align="center">
 This is my first use of vs code. It's a compilator and randomizer of wikipedia cult film webpage data.
+</h4>
+
 
 Goal is: Do not know what to watch tonight ? Want something else from casual netflix/disney/amazon ? 
 Want somethingthat had an impact in it's days ? Something that gathered people over it's own original beauty ?
+
 Why not try something cult you don't know, one of the over 3000 movies in the <a href="https://en.wikipedia.org/wiki/List_of_cult_films" target="_blank">:sparkles:Wikipedia List Of Cult Films:sparkles:</a> ? 
 
-</h4>
+
 
 
 <p align="center">
