@@ -1,10 +1,11 @@
 #! /usr/bin/python3
-# film_gspread.py - Downloads the wikipedia list of cult films
-#               And put it into a shelve, then to a google sheet
+# film_gspread.py - put the loaded shelf in to a google sheet
 
 
 
 import shelve, gspread
+
+# Create a list from the shelf dictionnary
 
 with shelve.open('film') as filmShelf:
     gspread_list = [['Title','Year','Director']]
@@ -17,6 +18,7 @@ with shelve.open('film') as filmShelf:
 
 print(f'gspread_list done. len = {len(gspread_list)}. Uploading to Gsheet.')
 
+# Load it in the gogle sheet
 
 gc = gspread.oauth()
 worksheet = gc.open('Wiki Cult').sheet1
