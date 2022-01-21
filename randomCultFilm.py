@@ -5,8 +5,8 @@
 import random, shelve, pprint
 with shelve.open('film') as filmShelf:
     while True :
-        name = list(filmShelf.keys())
-        choice = random.choice(name)
+        names = list(filmShelf.keys())
+        choice = random.choice(names)
         print(f'The random film I choose is *** {choice} ***')
         pprint.pprint(filmShelf[choice])
         a = input(' Push Enter\n\n')
