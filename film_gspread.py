@@ -7,7 +7,7 @@
 import shelve, gspread
 
 with shelve.open('film') as filmShelf:
-    gspread_list = []
+    gspread_list = [['Title','Year','Director']]
     for name in list(filmShelf.keys()):
         gspread_list.append([filmShelf[name]['Title'],
                              filmShelf[name]['Year'],
