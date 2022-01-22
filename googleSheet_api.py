@@ -1,11 +1,11 @@
 #! /usr/bin/python3
-# film_gspread.py - put the loaded shelf in to a google sheet
+# googleSheet_api.py - put the loaded shelf in to a google sheet
 
 
 
 import shelve, gspread
 
-# Create a list from the shelf dictionnary
+# Download the list from the shelf dictionnary
 
 with shelve.open('film') as filmShelf:
     gspread_list = [['Title','Year','Director']]
@@ -18,7 +18,7 @@ with shelve.open('film') as filmShelf:
 
 print(f'gspread_list done. len = {len(gspread_list)}. Uploading to Gsheet.')
 
-# Load it in the gogle sheet
+# Upload the list in the google sheet
 
 gc = gspread.oauth()
 worksheet = gc.open('Wiki Cult').sheet1
