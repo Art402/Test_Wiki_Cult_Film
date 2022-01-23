@@ -22,5 +22,5 @@ print(f'gspread_list done. len = {len(gspread_list)}. Uploading to Gsheet.')
 
 gc = gspread.oauth()
 worksheet = gc.open('Wiki Cult').sheet1
-worksheet.update(f'A2', gspread_list)
+worksheet.update('A2', gspread_list)
 print('Done.')
