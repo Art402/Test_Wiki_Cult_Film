@@ -14,11 +14,14 @@ gc = gspread.oauth()
 worksheet = gc.open('Wiki Cult').sheet1
 list_of_lists = worksheet.get_all_values()
 end_list = []
-# TODO : For each film find the corresponding film in the imdb database
 
+
+
+
+# TODO : For each film find the corresponding film in the imdb database
 import imdb
 ia = imdb.IMDb()
-i = 0
+i = 1
 for sheet_movie in list_of_lists :
     i+=1
     title, year, director = sheet_movie[0:3]
@@ -39,6 +42,8 @@ for sheet_movie in list_of_lists :
         end_movie = None
         continue
     
+
+
 # TODO : Load every interesting infos from the imdb database film
     movie_list = [end_movie['smart long imdb canonical title'],
                   end_movie['year'],
@@ -78,9 +83,11 @@ for sheet_movie in list_of_lists :
     
     logging.info(f'''end_list done. {movie_list}''')
     
+
+
 # TODO : Update the Google sheet
 
     gc = gspread.oauth()
-    worksheet = gc.open('Wiki Cult').sheet1
-    worksheet.update('A2', f'[{movie_list}]')
+    worksheet = gc.open('Wiki Cult').Sheet
+    worksheet.update(f'A{i}', f'{movie_list}')
     print('Done.')
