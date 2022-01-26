@@ -8,48 +8,44 @@ logging.basicConfig(level=logging.INFO, format='''%(asctime)s -  %(levelname)s
 logging.info('Start of program')
 
 
-# TODO : Load films name year and director from the google sheet.
-import gspread
-gc = gspread.oauth()
-worksheet = gc.open('Wiki Cult').sheet1
-list_of_lists = worksheet.get_all_values()
-end_list = []
+
+def load_wiki_list_of_cult_films(gc):
+    # TODO : Load films name year and director from the google sheet.
+    
+    worksheet = gc.open('Wiki Cult').sheet1
+    wiki_list_of_cult_films = worksheet.get_all_values()
+    return(wiki_list_of_cult_films)
 
 
 
-
-# TODO : For each film find the corresponding film in the imdb database
-import imdb
-ia = imdb.IMDb()
-i = 1
-for sheet_movie in list_of_lists :
-    i+=1
-    title, year, director = sheet_movie[0:3]
+def search_corresponding_imdb_movie(wiki_movie,ia):
+    # TODO : For each film find the corresponding film in the imdb database
+    title, year, director = wiki_movie[0:3]
     logging.info(f'title, year, director {title, year, director}')
     imdb_movies = ia.search_movie(title)
     # Find the good movie in the search list
+    good_imdb_movie = None
     try :
         for imdb_movie in imdb_movies:
             logging.info(f"imdb_movie['year'] {imdb_movie['year']}")
             if 'year' in imdb_movie.keys() and int(imdb_movie['year']) == int(year):
-                end_movie = imdb_movie
+                good_imdb_movie = imdb_movie
                 break
             else:
                 continue
     except Exception as err:
         logging.info(f'''{title} not in search_movie() : {imdb_movies} \n
                      err : {err}''')
-        end_movie = None
-        continue
+    return(good_imdb_movie)
     
 
-
+def load_list(good_imdb_movie, ia):
 # TODO : Load every interesting infos from the imdb database film
-    movie_list = [end_movie['smart long imdb canonical title'],
-                  end_movie['year'],
-                  end_movie['full-size cover url']]
+    imdb_list = [good_imdb_movie['smart long imdb canonical title'],
+                 good_imdb_movie['year'],
+                 good_imdb_movie['full-size cover url']]
 
-    ia.update(end_movie, info=['main'])
+    ia.update(good_imdb_movie, info=['main'])
     main_keys = ['imdbID',
                 'original title',
                 'genres',
@@ -60,34 +56,61 @@ for sheet_movie in list_of_lists :
                 'rating',
                 'votes',
                 'plot outline'
-                 ]
+                ]
     for key in main_keys:
-        if key in end_movie.keys():
-            movie_list.append(end_movie[key])
+        if key in good_imdb_movie.keys():
+            imdb_list.append(str(good_imdb_movie[key]))
         else:
-            movie_list.append(None)
+            imdb_list.append(None)
             
     main_personkeys = ['director',
                        'composer'
                        ]
     for key in main_personkeys:
-        if key in end_movie.keys():
+        if key in good_imdb_movie.keys():
             temp = []
-            for person in end_movie[key]:
+            for person in good_imdb_movie[key]:
                 temp.append(person['name'])
-            movie_list.append(temp)
+            imdb_list.append(str(temp))
         else:
-            movie_list.append(None)
+            imdb_list.append(None)
+    logging.info(f'''imdb_list done. {imdb_list}''')
     
-    end_list.append(movie_list)
+    return(imdb_list)
     
-    logging.info(f'''end_list done. {movie_list}''')
+    
     
 
-
+def update_gcp(imdb_list, gc, i):
 # TODO : Update the Google sheet
+    spreadsheet = gc.open('Wiki Cult')
+    worksheet = spreadsheet.worksheet('imdb_api')
+    worksheet.update(f'A{i}', [imdb_list])
 
+
+def main():
+    import gspread
     gc = gspread.oauth()
-    worksheet = gc.open('Wiki Cult').Sheet
-    worksheet.update(f'A{i}', f'{movie_list}')
-    print('Done.')
+    wiki_list_of_cult_films = load_wiki_list_of_cult_films(gc)
+    import imdb
+    ia = imdb.IMDb()
+    i = 0
+    n = len(wiki_list_of_cult_films)
+    for wiki_movie in wiki_list_of_cult_films :
+        i+=1
+        good_imdb_movie = search_corresponding_imdb_movie(wiki_movie,ia)
+        if good_imdb_movie == None :
+            imdb_list = wiki_movie+['IMDB NOT FOUND']
+        else : 
+            imdb_list = load_list(good_imdb_movie, ia)
+        update_gcp(imdb_list, gc, i)
+        logging.info(f'''
+************************
+Done Uploading {imdb_list[0:3]}
+************************
+film n°{i} / {n}
+************************
+''')
+
+if __name__=='__main__':
+    main()
